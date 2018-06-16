@@ -9,20 +9,8 @@ import com.teachme.domain.*;
 
 
 @CrossOrigin(origins = "http://localhost:4200")
-public interface NodeRepository extends PagingAndSortingRepository<Node, Long> {
+public interface hasChildRepository extends PagingAndSortingRepository<Node, Long> {
 
-    Optional<Node> findBynodeId(@Param("nodeId") Long id);
-    List<Node> findByquestion(@Param("question") String Question);
-    List<Node> findByanswer(@Param("answer") String Answer);
-    List<Node> findByinformation(@Param("information") String information);
-
-    String cypherQuery = "MATCH p=(n:Node {nodeId:{id}})-[:hasChild *0..]->(child) WITH COLLECT(p) AS ps CALL apoc.convert.toTree(ps) yield value RETURN apoc.convert.toJson(value)";
-    String cypherQueryCT = 
-    "MATCH (n:Node {rootId: {id}})-[rel:hasChild]->(child: Node) RETURN rel, child";
-    
-    //@Query("MATCH (n:Node {nodeId: {id}})-[rel:hasChild *0..]->(child: Node) RETURN rel, child")
-    @Query(cypherQueryCT)
-    String tree(@Param("id") Long id);
 }
 
 

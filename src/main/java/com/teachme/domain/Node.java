@@ -16,15 +16,17 @@ public class Node {
     private String question;
     private String answer;
     private String information;
+    private Long rootId;
     
 
 	private Node() { };
 
-	public Node(Long nodeId, String question, String answer, String information) {
+	public Node(Long nodeId, String question, String answer, String information, Long rootId) {
         this.nodeId = nodeId;
         this.question = question;
         this.answer = answer;
         this.information = information;
+        this.rootId = rootId;
     }
     
 	@Relationship(type = "hasChild")
@@ -45,6 +47,14 @@ public class Node {
 
     public void setnodeId(Long nodeId) {
         this.nodeId = nodeId; 
+    }
+
+    public void setrootId(Long rootId) {
+        this.rootId = rootId;
+    }
+
+    public Long getrootId() {
+        return this.rootId;
     }
     
 	public String getQuestion() {

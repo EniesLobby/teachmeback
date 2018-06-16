@@ -1,0 +1,57 @@
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="js/logic.js"></script>
+        
+        <script src="cytoscape\dist\cytoscape.js"></script>
+        <script src="https://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/jquery-ui.min.js"></script>
+
+        <script src="js/requests.js"></script>
+
+        <link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/themes/sunny/jquery-ui.css">
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+
+    <body>
+        <table>
+            <tr>
+                <td>
+                    <h4>Todo list:</h4>
+                    <ul>
+                        <li>Ajax</li>
+                        <li>circle around a circle</li>
+                        <li>json string from back</li>
+                        <li>create users api</li>
+                    </ul>
+                    <button id="GetTreeById">get a tree</button>
+                </td>
+
+                <td>
+                    <h4>Add node to nodeId</h4>
+                    <form id="addNode">
+                        nodeId:<br> <input type="text" length="50" id="nodeId"><br>
+                        question:<br> <input type="text" length="50" id="question"><br>
+                        answer:<br> <input type="text" length="50" id="answer"><br>
+                        information:<br> <input type="text" length="50" id="information"><br>
+                        rootId:<br> <input type="text" length="50" id="rootId">
+                        <button type="submit">Add</button>
+                    </form>
+                </td>
+
+                <td>
+                    <div id="postResultDiv"></div>
+                </td>
+
+                <td>
+                    <h4>Delete all nodes from db</h4>
+                    <button id="deleteAll">DeleteAll</button>
+                    <h4>Create a Tree</h4>
+                    <button id="createTree">create</button>
+                </td>
+            </tr>
+        </table>
+
+        <div id="cy"></div>
+
+    </body>
+</html>

@@ -3,7 +3,9 @@ import java.util.*;
 
 import com.teachme.domain.Node;
 import com.teachme.domain.Counter;
+import com.teachme.domain.hasChild;
 import com.teachme.repositories.NodeRepository;
+import com.teachme.repositories.hasChildRepository;
 import com.teachme.repositories.CounterRepository;
 import org.springframework.stereotype.Service;
 
@@ -12,14 +14,18 @@ public class NodeService {
 
     private final NodeRepository nodeRepository;
     private final CounterRepository counterRepository;
+    private final hasChildRepository haschildRepository;
     
-    public NodeService(NodeRepository nodeRepository, CounterRepository counterRepository) {
+    public NodeService(NodeRepository nodeRepository, CounterRepository counterRepository,
+                        hasChildRepository haschildRepository) {
         this.nodeRepository = nodeRepository;
         this.counterRepository = counterRepository;
+        this.haschildRepository = haschildRepository;
     }
 
     public void createTree() {
-        Node root = new Node(getCurrentCounter(), "", "", "");
+        Long rootId = getCurrentCounter();
+        Node root = new Node(rootId, "", "", "", rootId);
         nodeRepository.save(root);
         //write this id to user's tree list as root
     }
@@ -46,6 +52,7 @@ public class NodeService {
         Long nodeId = getCurrentCounter();
         node.setnodeId(nodeId);
         //Node child = new Node(getCurrentCounter(), question, answer, information);
+        //Add relation information
 
         if(found_node.isPresent()) {
             found_node.get().addChild(node);
@@ -64,6 +71,7 @@ public class NodeService {
 
     public void updateNode(Long Id, String question, String answer, String information) {
         Optional<Node> node = nodeRepository.findBynodeId(Id);
+        
         if(node.isPresent()) {
             node.get().setAnswer(answer);
             node.get().setQuestion(question);

@@ -1,0 +1,26 @@
+.node {
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    background: #ccc;
+    border: 3px solid #000;
+    color: red;
+	/* width and height can be anything, as long as they're equal */
+}
+
+#cy {
+    width: 100%;
+    height: 800px;
+    position: absolute;
+    top: 250px;
+    left: 0px;
+}
+
+#circle {
+    width: 100px;
+    height: 100px;
+    background: red;
+    -moz-border-radius: 50px;
+    -webkit-border-radius: 50px;
+    border-radius: 50px;
+}

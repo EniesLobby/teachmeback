@@ -1,18 +1,22 @@
 package com.teachme.controllers;
-
 import com.teachme.domain.*;
 import com.teachme.services.*;
+
+import org.neo4j.kernel.api.exceptions.Status.Request;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.*; 
@@ -34,7 +38,7 @@ public class NodeController {
         return nodeService.NodeTest();
     }
 
-    @GetMapping("/createTree")
+    @RequestMapping(value = "/createTree", method = RequestMethod.POST)
     public void createTree() {
         nodeService.createTree();
     }
@@ -62,7 +66,7 @@ public class NodeController {
         nodeService.deleteNode(Id);
     }
 
-    @GetMapping("/deleteAll")
+    @DeleteMapping(path = "/deleteAll")
     public void deleteAllNodes() {
         nodeService.deleteAll();
     }
