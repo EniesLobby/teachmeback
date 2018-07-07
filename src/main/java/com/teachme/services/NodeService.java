@@ -1,13 +1,13 @@
 package com.teachme.services;
 import java.util.*;
 
-import com.teachme.domain.Node;
-import com.teachme.domain.Counter;
-import com.teachme.domain.hasChild;
+import com.teachme.domain.*;
 import com.teachme.repositories.NodeRepository;
-import com.teachme.repositories.hasChildRepository;
 import com.teachme.repositories.CounterRepository;
+import com.teachme.repositories.hasChildRepository;
 import org.springframework.stereotype.Service;
+
+import org.springframework.boot.json.*;
 
 @Service
 public class NodeService {
@@ -17,7 +17,7 @@ public class NodeService {
     private final hasChildRepository haschildRepository;
     
     public NodeService(NodeRepository nodeRepository, CounterRepository counterRepository,
-                        hasChildRepository haschildRepository) {
+        hasChildRepository haschildRepository) {
         this.nodeRepository = nodeRepository;
         this.counterRepository = counterRepository;
         this.haschildRepository = haschildRepository;
@@ -51,11 +51,19 @@ public class NodeService {
         Optional<Node> found_node = nodeRepository.findBynodeId(Id);
         Long nodeId = getCurrentCounter();
         node.setnodeId(nodeId);
+
+        //create a relation
         //Node child = new Node(getCurrentCounter(), question, answer, information);
+        
         //Add relation information
 
         if(found_node.isPresent()) {
-            found_node.get().addChild(node);
+            Node source = found_node.get();
+            Node target = node;
+
+            hasChild rel = new hasChild(source, target);
+
+            found_node.get().addChild(source, target);
             nodeRepository.save(found_node.get());
         }
     }
@@ -69,13 +77,16 @@ public class NodeService {
         return thenode.get();
     }
 
-    public void updateNode(Long Id, String question, String answer, String information) {
-        Optional<Node> node = nodeRepository.findBynodeId(Id);
+    public void updateNode(Long Id, Node node) {
+        //History mechanism (??)
+        Optional<Node> found_node = nodeRepository.findBynodeId(Id);
         
-        if(node.isPresent()) {
-            node.get().setAnswer(answer);
-            node.get().setQuestion(question);
-            node.get().setInformation(information);
+        if(found_node.isPresent()) {
+            found_node.get().setAnswer(node.getAnswer());
+            found_node.get().setQuestion(node.getQuestion());
+            found_node.get().setInformation(node.getInformation());
+
+            nodeRepository.save(found_node.get());
         }
     }
 
@@ -90,19 +101,115 @@ public class NodeService {
         nodeRepository.deleteAll();
     }
 
+    
+    public String treeFromIdCT(Long Id) {
+        
+        //Relations
+        List<String> resultListRelations = treeFromIdMap(Id);
+        //Nodes
+        List<String> resultListNodes = new ArrayList<String>();
+
+        //Convert List<Node> to List<String> in {data: {Node}} format
+        
+        Long   nodeId;
+        String question;
+        String answer;
+        String information;
+        Long   rootId;
+
+        String resultNodeString = "";
+        List<Node> ListNodes = nodeRepository.treeCT(Id);
+
+        for( int i = 0; i < ListNodes.size(); i ++ ) {
+            
+            nodeId      = ListNodes.get(i).getnodeId();
+            question    = ListNodes.get(i).getQuestion();
+            answer      = ListNodes.get(i).getAnswer();
+            information = ListNodes.get(i).getInformation();
+            rootId      = ListNodes.get(i).getrootId();
+
+            resultNodeString = "{ \"data\": { \"id\": \"" + nodeId + "\", \"question\": \"" + question + "\", " + 
+                               "\"answer\": \"" + answer + "\", \"information\": \"" + information + "\", \"rootId\": \"" + rootId + "\" } }";
+            resultListNodes.add(resultNodeString);
+
+            resultNodeString = "";
+        }
+
+        //Result TreeJsonString
+        String treeJsonString = "[ ";
+
+        for(int i = 0; i < resultListNodes.size(); i ++ ) {
+            treeJsonString = treeJsonString + resultListNodes.get(i) + ", ";
+        }
+
+        for(int i = 0; i <  + resultListRelations.size(); i ++ ) {
+            treeJsonString = treeJsonString + resultListRelations.get(i) + ", ";
+        }
+
+        treeJsonString = treeJsonString.substring(0, treeJsonString.length() - 2);
+        treeJsonString = treeJsonString + " ]";
+
+        return treeJsonString;
+    }
+
+    //Returns List<String> with relations in {data: {ctResult}} format
+    public  List<String> treeFromIdMap(Long Id) {
+
+        /**
+         * private String id;
+           private Long source;
+           private Long target; */
+        
+        List<ctResult> listOfRel = haschildRepository.tree(Id);
+        
+        String id;
+        Long source = 2L;
+        Long target = 2L;
+
+        String result;
+        List<String> resultListRelations = new ArrayList<String>();
+
+        for( int i = 0; i < listOfRel.size(); i ++ ) {
+            
+            id = listOfRel.get(i).getid();
+            source = listOfRel.get(i).getSource();
+            target = listOfRel.get(i).getTarget();
+    
+            result = "{" + " \"data\": { \"id\": \"" + id + "\", \"source\": \"" + source + "\", \"target\": \"" + target + "\" } }";
+
+            resultListRelations.add(result);
+            result = "";
+        }
+
+        return resultListRelations;
+    }
+}
+
+
+/**
+ * 
+ *     public String treeCTFromString(String tree, Long Id) {
+        
+        /////////////////////////////
+        String result = "";
+
+        Collection<?> treect = this.treeFromIdCT(Id);
+        Iterator i = treect.iterator();
+
+        while(i.hasNext()) {
+            result = result + i.next();
+            result = result + "";
+        }
+        
+
+        return result;
+    }
 
     public String treeFromId(Long Id) {
-        return nodeRepository.tree(Id);
+        String tree = nodeRepository.tree(Id);
+        String treeCTString = treeCTFromString(tree, Id);
+        
+        return treeCTString;
     }
 
-
-    public String NodeTest() {
-        
-        String resultString = "";
-        
-        return resultString;
-    }
-
-
-
-}
+ */

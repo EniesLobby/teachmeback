@@ -7,6 +7,7 @@ import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+
 @NodeEntity
 public class Node {
 
@@ -30,14 +31,15 @@ public class Node {
     }
     
 	@Relationship(type = "hasChild")
-    private List<Node> children = new ArrayList<>();
+    private List<hasChild> children = new ArrayList<>();
 
-    public void addChild(Node child) {
+    public void addChild(Node source, Node target) {
+        hasChild rel = new hasChild(source, target);
         
-        children.add(child);
+        children.add(rel);
     }
 
-    public List<Node> getChildren(){
+    public List<hasChild> getChildren(){
         return children;
     }
     

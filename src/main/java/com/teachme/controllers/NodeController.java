@@ -2,24 +2,18 @@ package com.teachme.controllers;
 import com.teachme.domain.*;
 import com.teachme.services.*;
 
-import org.neo4j.kernel.api.exceptions.Status.Request;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
-
-import java.util.*; 
 
 @RestController
 @RequestMapping("/nodes")
@@ -33,19 +27,14 @@ public class NodeController {
 		this.nodeService = nodeService;
 	}
 
-    @GetMapping("/test")
-    public String nodes() {
-        return nodeService.NodeTest();
-    }
-
     @RequestMapping(value = "/createTree", method = RequestMethod.POST)
     public void createTree() {
         nodeService.createTree();
     }
-    
-    @GetMapping("/getTree") //returns json string with tree starting from nodeId
-    public String getTree(@RequestParam long id) {
-        return nodeService.treeFromId(id);
+
+    @GetMapping("/getTreeCT") //returns json tree in cytoscape format
+    public String getTreeCT(@RequestParam long id) {
+        return nodeService.treeFromIdCT(id);
     }
 
     //Retrieve a single node
@@ -61,7 +50,7 @@ public class NodeController {
         nodeService.addChildToNode(id, node);
     }
 
-    @GetMapping("/deleteNode")
+    @DeleteMapping("/deleteNode")
     public void deleteNode(@RequestParam Long Id) {
         nodeService.deleteNode(Id);
     }
@@ -74,5 +63,10 @@ public class NodeController {
     @GetMapping("/createCounter")
     public void createCounter() {
         nodeService.createCounter();
+    }
+
+    @PutMapping("/node/{id}")
+    public void updateNode(@PathVariable("id") long id, @RequestBody Node node) {
+        nodeService.updateNode(id, node);
     }
 }

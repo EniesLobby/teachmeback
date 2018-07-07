@@ -1,47 +1,54 @@
 package com.teachme.domain;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.neo4j.ogm.annotation.*;
-import org.neo4j.ogm.annotation.GeneratedValue;
-import org.neo4j.ogm.annotation.Id;
-import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Relationship;
 
 @RelationshipEntity(type = "hasChild")
 public class hasChild {
-    
-    @Id @GeneratedValue private Long id;
-    
+    @Id
+    @GeneratedValue
+    private Long id;
+    private Long source_nodeId;
+    private Long target_nodeId;
     private Long rootId;
-    private String hasChildId; //format source-target
 
-    @StartNode
-    private Node source;
+	@StartNode
+	private Node source;
 
-    @EndNode
-    private Node target;
+	@EndNode
+	private Node target;
 
-    public hasChild(Node source, Node target) {
+	public hasChild() { }
+
+	public hasChild(Node source, Node target) {
         this.source = source;
+        this.source_nodeId = source.getnodeId();
+
         this.target = target;
+        this.target_nodeId = target.getnodeId();
+
+        this.rootId = source.getrootId();
+	}
+
+	public Long getId() {
+	    return id;
+	}
+
+	public Node getSource() {
+	    return source;
+	}
+
+	public Node getTarget() {
+	    return target;
+    }
+    
+    public Long getsourceId() {
+        return source_nodeId;
     }
 
-    public void setSource(Node source) {
-        this.source = source;
+    public Long gettargetId() {
+        return target_nodeId;
     }
-
-    public Node getSource() {
-        return this.source;
-    }
-
-    public void setTarget(Node target) {
-        this.target = target;
-    }
-
-    public Node getTarget() {
-        return this.target;
-    }
-
-
 }

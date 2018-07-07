@@ -57,15 +57,16 @@
 		<dependency>
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-ogm-embedded-driver</artifactId>
-			<version>${neo4j-ogm.version}</version>
+			<version>3.1.0</version>
 			<scope>test</scope>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-ogm-bolt-driver</artifactId>
-			<version>${neo4j-ogm.version}</version>
+			<version>3.1.0</version>
 		</dependency>
+
 
 	</dependencies>
 
