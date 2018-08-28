@@ -20,8 +20,7 @@ public interface NodeRepository extends PagingAndSortingRepository<Node, Long> {
     String cypherQueryCT = "MATCH (n:Node { nodeId:{id} })-[rel:hasChild *0..]->(child: Node) RETURN child.nodeId, rel";
 
     String nodes = "MATCH p=(n:Node { rootId: {id} })-[rel:hasChild]-() RETURN n"; //returns only nodes List<Node>
-    String relations = 
-    "MATCH p = (a)-[rel:hasChild]-(b) RETURN a.nodeId as nodeId, rel.source_nodeId as sourceId, rel.target_nodeId as targetId, rel.rootId as rootId";
+    String relations = "MATCH p = (a)-[rel:hasChild]-(b) RETURN a.nodeId as nodeId, rel.source_nodeId as sourceId, rel.target_nodeId as targetId, rel.rootId as rootId";
 
     /**
  * class ctResult {
@@ -30,8 +29,6 @@ public interface NodeRepository extends PagingAndSortingRepository<Node, Long> {
     Long targetId;
     Long rootId;
 } */
-
-    
     //@Query("MATCH (n:Node {nodeId: {id}})-[rel:hasChild *0..]->(child: Node) RETURN rel, child")
     @Query(relations)
     String tree(@Param("id") Long id);

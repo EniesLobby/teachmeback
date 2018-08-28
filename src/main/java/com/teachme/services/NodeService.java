@@ -7,7 +7,6 @@ import com.teachme.repositories.CounterRepository;
 import com.teachme.repositories.hasChildRepository;
 import org.springframework.stereotype.Service;
 
-import org.springframework.boot.json.*;
 
 @Service
 public class NodeService {
@@ -60,8 +59,6 @@ public class NodeService {
         if(found_node.isPresent()) {
             Node source = found_node.get();
             Node target = node;
-
-            hasChild rel = new hasChild(source, target);
 
             found_node.get().addChild(source, target);
             nodeRepository.save(found_node.get());
@@ -184,32 +181,3 @@ public class NodeService {
         return resultListRelations;
     }
 }
-
-
-/**
- * 
- *     public String treeCTFromString(String tree, Long Id) {
-        
-        /////////////////////////////
-        String result = "";
-
-        Collection<?> treect = this.treeFromIdCT(Id);
-        Iterator i = treect.iterator();
-
-        while(i.hasNext()) {
-            result = result + i.next();
-            result = result + "";
-        }
-        
-
-        return result;
-    }
-
-    public String treeFromId(Long Id) {
-        String tree = nodeRepository.tree(Id);
-        String treeCTString = treeCTFromString(tree, Id);
-        
-        return treeCTString;
-    }
-
- */
