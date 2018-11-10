@@ -1,10 +1,7 @@
 package com.teachme.services;
 import java.util.*;
-
 import com.teachme.domain.*;
-import com.teachme.repositories.NodeRepository;
-import com.teachme.repositories.CounterRepository;
-import com.teachme.repositories.hasChildRepository;
+import com.teachme.repositories.*;
 import org.springframework.stereotype.Service;
 
 
@@ -14,18 +11,27 @@ public class NodeService {
     private final NodeRepository nodeRepository;
     private final CounterRepository counterRepository;
     private final hasChildRepository haschildRepository;
+    private final hasInformationRepository hasInformationRepository;
+    private final informationRepository informationRepository;
+    private final multiInformationRepository multiInformationRepository;
     
     public NodeService(NodeRepository nodeRepository, CounterRepository counterRepository,
-        hasChildRepository haschildRepository) {
+        hasChildRepository haschildRepository, hasInformationRepository hasinformationRepository, 
+        informationRepository informationRepository, multiInformationRepository multiInformationRepository) {
         this.nodeRepository = nodeRepository;
         this.counterRepository = counterRepository;
         this.haschildRepository = haschildRepository;
+        this.hasInformationRepository = hasinformationRepository;
+        this.informationRepository = informationRepository;
+        this.multiInformationRepository = multiInformationRepository;
     }
 
-    public void createTree() {
+    // Creates new tree and returns id of the root
+    public Long createTree() {
         Long rootId = getCurrentCounter();
-        Node root = new Node(rootId, "", "", "", rootId);
+        Node root = new Node(rootId, "", "", "", "", "", "", rootId);
         nodeRepository.save(root);
+        return rootId;
         //write this id to user's tree list as root
     }
 
@@ -45,16 +51,11 @@ public class NodeService {
         return currentCounter;
     }
 
-    public void addChildToNode(Long Id, Node node) {
+    public Long addChildToNode(Long Id, Node node) {
         
         Optional<Node> found_node = nodeRepository.findBynodeId(Id);
         Long nodeId = getCurrentCounter();
         node.setnodeId(nodeId);
-
-        //create a relation
-        //Node child = new Node(getCurrentCounter(), question, answer, information);
-        
-        //Add relation information
 
         if(found_node.isPresent()) {
             Node source = found_node.get();
@@ -63,39 +64,74 @@ public class NodeService {
             found_node.get().addChild(source, target);
             nodeRepository.save(found_node.get());
         }
+
+        return nodeId;
     }
 
     public Node getNode(Long Id) {
         Optional<Node> thenode = nodeRepository.findBynodeId(Id);
         
-        if(!thenode.isPresent()){
-            //error
+        if(!thenode.isPresent()) {
+            
         }
         return thenode.get();
     }
 
     public void updateNode(Long Id, Node node) {
-        //History mechanism (??)
+    
         Optional<Node> found_node = nodeRepository.findBynodeId(Id);
         
         if(found_node.isPresent()) {
             found_node.get().setAnswer(node.getAnswer());
             found_node.get().setQuestion(node.getQuestion());
             found_node.get().setInformation(node.getInformation());
+            found_node.get().setAnswerHtml(node.getAnswerHtml());
+            found_node.get().setQuestionHtml(node.getQuestionHtml());
+            found_node.get().setQuestionLabel(node.getQuestionLabel());
 
             nodeRepository.save(found_node.get());
         }
     }
 
-    public void deleteNode(Long Id) {
+    // Delete node with all related information
+    public void deleteNode(Long nodeId) {
         
-        if(nodeRepository.existsById(Id)) {
-            nodeRepository.deleteById(Id);
-        }
     }
 
     public void deleteAll() {
         nodeRepository.deleteAll();
+        multiInformationRepository.deleteAll();
+        informationRepository.deleteAll();
+    }
+
+    public void addInformation(Long node_id, String answer_id, String information, String note) {
+        Optional<Node> found_node = nodeRepository.findBynodeId(node_id);
+
+        if(found_node.isPresent()) {
+            Optional<Information> found_inf = informationRepository.findBynodeId(node_id);
+            if(found_inf.isPresent()) {
+                Optional<multiInformation> found_multiInf = multiInformationRepository.getOneInformation(node_id, answer_id);
+
+                if(found_multiInf.isPresent()) {
+                    found_multiInf.get().setInformation(information);
+                    multiInformationRepository.save(found_multiInf.get());
+                } else {
+                    found_inf.get().setNewMultiInformation(answer_id, information, "");
+                    informationRepository.save(found_inf.get());
+                }
+
+            } else {
+                Information newInf = new Information(note, found_node.get().getrootId(), found_node.get().getnodeId());
+                newInf.setNewMultiInformation(answer_id, information, "");
+                hasInformation relInf = new hasInformation(found_node.get(), newInf);
+                found_node.get().addInformation(relInf);
+                nodeRepository.save(found_node.get());
+            }
+        }
+    }
+
+    public void deleteInformation(Long node_id, Long answer_id) {
+        
     }
 
     
@@ -111,6 +147,9 @@ public class NodeService {
         Long   nodeId;
         String question;
         String answer;
+        String question_html;
+        String answer_html;
+        String question_label;
         String information;
         Long   rootId;
 
@@ -121,19 +160,24 @@ public class NodeService {
             
             nodeId      = ListNodes.get(i).getnodeId();
             question    = ListNodes.get(i).getQuestion();
+            question_html = ListNodes.get(i).getQuestionHtml();
             answer      = ListNodes.get(i).getAnswer();
+            answer_html = ListNodes.get(i).getAnswerHtml();
             information = ListNodes.get(i).getInformation();
             rootId      = ListNodes.get(i).getrootId();
+            question_label = ListNodes.get(i).getQuestionLabel();
 
-            resultNodeString = "{ \"data\": { \"id\": \"" + nodeId + "\", \"question\": \"" + question + "\", " + 
+            resultNodeString = "{ \"data\": { \"id\": \"" + nodeId + "\", \"question\": \"" + question + "\", " +
+                               "\"answerHtml\": \"" + answer_html + "\", " + "\"questionHtml\": \"" + question_html + "\", " + "\"questionLabel\": \"" + question_label + "\", " +
                                "\"answer\": \"" + answer + "\", \"information\": \"" + information + "\", \"rootId\": \"" + rootId + "\" } }";
+            
             resultListNodes.add(resultNodeString);
 
             resultNodeString = "";
         }
 
         //Result TreeJsonString
-        String treeJsonString = "[ ";
+        String treeJsonString = "[  ";
 
         for(int i = 0; i < resultListNodes.size(); i ++ ) {
             treeJsonString = treeJsonString + resultListNodes.get(i) + ", ";
@@ -179,5 +223,15 @@ public class NodeService {
         }
 
         return resultListRelations;
+    }
+
+    public List<Node> getChildren(Long id) {
+        List<Node> children =  this.nodeRepository.getChildren(id);
+        return children;
+    }
+
+    public List<multiInformation> getAllInformation(Long nodeId) {
+        List<multiInformation> allInf = this.multiInformationRepository.getAllInformation(nodeId);
+        return allInf;
     }
 }

@@ -1,5 +1,4 @@
 package com.teachme.repositories;
-
 import java.util.*;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -18,18 +17,17 @@ public interface NodeRepository extends PagingAndSortingRepository<Node, Long> {
 
     String cypherQuery = "MATCH p = (n:Node {nodeId:{id}})-[:hasChild *0..]->(child) WITH COLLECT(p) AS ps CALL apoc.convert.toTree(ps) yield value RETURN apoc.convert.toJson(value)";
     String cypherQueryCT = "MATCH (n:Node { nodeId:{id} })-[rel:hasChild *0..]->(child: Node) RETURN child.nodeId, rel";
-
-    String nodes = "MATCH p=(n:Node { rootId: {id} })-[rel:hasChild]-() RETURN n"; //returns only nodes List<Node>
+ 
+    //returns only nodes List<Node>
+    String nodes = "MATCH p=(n:Node { rootId: {id} }) RETURN n";
     String relations = "MATCH p = (a)-[rel:hasChild]-(b) RETURN a.nodeId as nodeId, rel.source_nodeId as sourceId, rel.target_nodeId as targetId, rel.rootId as rootId";
 
-    /**
- * class ctResult {
-    Long nodeId;
-    Long sourceId;
-    Long targetId;
-    Long rootId;
-} */
-    //@Query("MATCH (n:Node {nodeId: {id}})-[rel:hasChild *0..]->(child: Node) RETURN rel, child")
+    //returns children of the given node List<Node>
+    String children = "MATCH p=(n:Node {nodeId: {nodeId}})-[rel:hasChild]->(child:Node) RETURN child";
+
+    //delete all node and information related
+    String delete = "MATCH (n1:Node {nodeId: {nodeId}})-[rel1:hasInformation]->(n2:Information)-[rel2:MULTI_INFORMATION]->(n3:multiInformation) DELETE rel1, rel2, n1, n2, n3";
+
     @Query(relations)
     String tree(@Param("id") Long id);
 
@@ -38,6 +36,12 @@ public interface NodeRepository extends PagingAndSortingRepository<Node, Long> {
 
     @Query(nodes)
     List<Node> treeCT(@Param("id") Long id);
+
+    @Query(children)
+    List<Node> getChildren(@Param("nodeId") Long id);
+
+    @Query(delete)
+    void existsBynodeId(@Param("nodeId") Long nodeId);
 }
 
 

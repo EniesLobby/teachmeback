@@ -14,24 +14,6 @@ public interface hasChildRepository extends PagingAndSortingRepository<hasChild,
     
     String test = 
     "MATCH p = (a)-[rel:hasChild]-(b) WHERE rel.rootId={id} RETURN rel";
-    
-/** class ctResult {
-        String id;
-        Long sourceId;
-        Long targetId 
-    } 
-    
-    MATCH (a:USER)-[:owns]->(b:ALBUM)-[:CONTAINS]->(c:PHOTO)
-    WITH a,b,{url: c.name} as c_photos
-    WITH a,{album: b.name , photos: collect(c_photos)} as b_albums
-    WITH {name: a.name, albums: collect(b_albums)} as a_users
-    RETURN {users: collect(a_users)}
-
-    MATCH (a:User)
-    WITH {user: str(a)} as users
-    RETURN {users: collect(users)}
-    
-    */
 
     @Query(relations)
     List<ctResult> tree(@Param("id") Long id);
