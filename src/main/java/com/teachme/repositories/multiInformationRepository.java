@@ -16,10 +16,15 @@ public interface multiInformationRepository extends PagingAndSortingRepository<m
     // returns multiInformation for given nodeId and Answer Id
     String informationDetailed = "MATCH (n1:multiInformation {idOfNodes: {answer_id}})<-[r1:MULTI_INFORMATION]-(:Information)<-[r2:hasInformation]-(n2:Node {nodeId: {nodeId}}) RETURN n1";
 
+    //deletes multiInformation for given nodeId and Answer id
+    String delete = "MATCH (n1:Node {nodeId: {nodeId}})-[:hasInformation]->(n2:Information)-[:MULTI_INFORMATION]->(n3:multiInformation {idOfNodes: {answer_id}}) RETURN n3";
 
     @Query(information)
     List<multiInformation> getAllInformation(@Param("nodeId") Long id);
 
     @Query(informationDetailed)
     Optional<multiInformation> getOneInformation(@Param("nodeId") Long id, @Param("answer_id") String answer_id);
+
+    @Query(delete)
+    void deleteAnswer(@Param("nodeId") Long nodeId, @Param("answer_id") String answer_id);
 }

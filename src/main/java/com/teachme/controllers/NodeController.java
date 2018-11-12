@@ -61,9 +61,14 @@ public class NodeController {
         return nodeService.addChildToNode(id, node);
     }
 
-    @DeleteMapping("/deleteNode")
-    public void deleteNode(@RequestParam Long nodeId) {
+    @DeleteMapping("/deleteNode/{nodeId}")
+    public void deleteNode(@PathVariable("nodeId") Long nodeId) {
         nodeService.deleteNode(nodeId);
+    }
+
+    @DeleteMapping("/deleteAnswer/node/{nodeId}/answer/{answer_id}")
+    public void deleteAnswer(@PathVariable("nodeId") Long nodeId, @PathVariable("answer_id") String answer_id) {
+        nodeService.deleteAnswer(nodeId, answer_id);
     }
 
     @DeleteMapping(path = "/deleteAll")

@@ -95,7 +95,14 @@ public class NodeService {
 
     // Delete node with all related information
     public void deleteNode(Long nodeId) {
-        
+        this.nodeRepository.deleteById(nodeId);
+        if(this.nodeRepository.findBynodeId(nodeId).isPresent()) {
+            this.nodeRepository.delete(this.nodeRepository.findBynodeId(nodeId).get());
+        }
+    }
+
+    public void deleteAnswer(Long nodeId, String answer_id) {
+        this.multiInformationRepository.deleteAnswer(nodeId, answer_id);
     }
 
     public void deleteAll() {
@@ -106,6 +113,9 @@ public class NodeService {
 
     public void addInformation(Long node_id, String answer_id, String information, String note) {
         Optional<Node> found_node = nodeRepository.findBynodeId(node_id);
+
+        System.out.print("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+        System.out.print(found_node.isPresent());
 
         if(found_node.isPresent()) {
             Optional<Information> found_inf = informationRepository.findBynodeId(node_id);

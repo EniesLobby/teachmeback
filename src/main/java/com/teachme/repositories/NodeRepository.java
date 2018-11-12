@@ -26,7 +26,7 @@ public interface NodeRepository extends PagingAndSortingRepository<Node, Long> {
     String children = "MATCH p=(n:Node {nodeId: {nodeId}})-[rel:hasChild]->(child:Node) RETURN child";
 
     //delete all node and information related
-    String delete = "MATCH (n1:Node {nodeId: {nodeId}})-[rel1:hasInformation]->(n2:Information)-[rel2:MULTI_INFORMATION]->(n3:multiInformation) DELETE rel1, rel2, n1, n2, n3";
+    String delete = "MATCH (n1:Node {nodeId: {nodeId}})-[rel1:hasInformation]->(n2:Information)-[rel2:MULTI_INFORMATION]->(n3:multiInformation) DETACH DELETE rel1, rel2, n1, n2, n3";
 
     @Query(relations)
     String tree(@Param("id") Long id);
@@ -41,7 +41,7 @@ public interface NodeRepository extends PagingAndSortingRepository<Node, Long> {
     List<Node> getChildren(@Param("nodeId") Long id);
 
     @Query(delete)
-    void existsBynodeId(@Param("nodeId") Long nodeId);
+    void deleteByNodeId(@Param("nodeId") Long nodeId);
 }
 
 
