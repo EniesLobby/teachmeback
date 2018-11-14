@@ -95,12 +95,13 @@ public class NodeService {
 
     // Delete node with all related information
     public void deleteNode(Long nodeId) {
-        this.nodeRepository.deleteById(nodeId);
         if(this.nodeRepository.findBynodeId(nodeId).isPresent()) {
+            this.nodeRepository.deleteByNodeIdhasChildren(nodeId);
             this.nodeRepository.delete(this.nodeRepository.findBynodeId(nodeId).get());
         }
     }
 
+    // it is just delete the node :)
     public void deleteAnswer(Long nodeId, String answer_id) {
         this.multiInformationRepository.deleteAnswer(nodeId, answer_id);
     }
