@@ -14,16 +14,19 @@ public class NodeService {
     private final hasInformationRepository hasInformationRepository;
     private final informationRepository informationRepository;
     private final multiInformationRepository multiInformationRepository;
+    private final UserRepository userRepository;
     
     public NodeService(NodeRepository nodeRepository, CounterRepository counterRepository,
         hasChildRepository haschildRepository, hasInformationRepository hasinformationRepository, 
-        informationRepository informationRepository, multiInformationRepository multiInformationRepository) {
+        informationRepository informationRepository, multiInformationRepository multiInformationRepository,
+        UserRepository userRepository) {
         this.nodeRepository = nodeRepository;
         this.counterRepository = counterRepository;
         this.haschildRepository = haschildRepository;
         this.hasInformationRepository = hasinformationRepository;
         this.informationRepository = informationRepository;
         this.multiInformationRepository = multiInformationRepository;
+        this.userRepository = userRepository;
     }
 
     // Creates new tree and returns id of the root
@@ -49,6 +52,17 @@ public class NodeService {
         counterRepository.save(counter);
 
         return currentCounter;
+    }
+
+    public void createUser(String email, String name, String password ) {
+        User user = new User(name, email, password);
+        userRepository.save(user);
+    }
+
+    public void addRootId(String email, String rootId) {
+        User user = userRepository.findByEmail(email);
+        user.setTreeRootIds(rootId);
+        userRepository.save(user);
     }
 
     public Long addChildToNode(Long Id, Node node) {
@@ -145,6 +159,28 @@ public class NodeService {
         
     }
 
+    public boolean checkUser(String email, String password) {
+        User user = userRepository.findByEmail(email);
+        if(Objects.equals(user.getPassword(), password)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public User getUser(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+
+    public void setTitle(Long rootId, String title) {
+        Optional<Information> information = this.informationRepository.findBynodeId(rootId);
+        
+        if(information.isPresent()) {
+            information.get().setNote(title);
+            this.informationRepository.save(information.get());
+        }
+    }
     
     public String treeFromIdCT(Long Id) {
         
@@ -244,5 +280,9 @@ public class NodeService {
     public List<multiInformation> getAllInformation(Long nodeId) {
         List<multiInformation> allInf = this.multiInformationRepository.getAllInformation(nodeId);
         return allInf;
+    }
+
+    public Information getInformation(Long rootId) {
+        return this.informationRepository.findBynodeId(rootId).get();
     }
 }

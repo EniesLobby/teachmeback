@@ -29,31 +29,31 @@ public class NodeController {
 		this.nodeService = nodeService;
 	}
 
-    //creates a tree
+    // creates a tree
     @RequestMapping(value = "/createTree", method = RequestMethod.POST)
     public Long createTree() {
         return nodeService.createTree();
     }
 
-    //returns json tree in cytoscape format
+    // returns json tree in cytoscape format
     @GetMapping("/getTreeCT")
     public String getTreeCT(@RequestParam long id) {
         return nodeService.treeFromIdCT(id);
     }
 
-    //Retrieve children of the given node
+    // Retrieve children of the given node
     @RequestMapping(value = "/node/{id}/children", produces = "application/json; charset=UTF-8", method = RequestMethod.GET)
     public @ResponseBody List<Node> getChildren(@PathVariable("id") long id) {
         return nodeService.getChildren(id);
     }
 
-    //Retrieve a single node
+    // Retrieve a single node
     @RequestMapping(value = "/node/{id}", method = RequestMethod.GET)
     public Node getNode(@PathVariable("id") long Id) {
         return nodeService.getNode(Id);
     }
 
-    //Add a node to ID
+    // Add a node to ID
     @RequestMapping(value = "/node/add/{id}", method = RequestMethod.POST)
     @ResponseBody
     public Long createNode(@PathVariable("id") long id, @RequestBody Node node) {
@@ -81,23 +81,15 @@ public class NodeController {
         nodeService.createCounter();
     }
 
-    //Update the given node
+    // Update the given node
     @PutMapping("/node/{id}")
     public void updateNode(@PathVariable("id") long id, @RequestBody Node node) {
         nodeService.updateNode(id, node);
     }
 
-    //Add or Update an Information to node ID and Answer id (String "nodeId-nodeId")
+    // Add or Update an Information to node ID and Answer id (String "nodeId-nodeId")
     @RequestMapping(value = "/node/information/add/{id_node}/answer", method = RequestMethod.POST)
     public void addInformation(@PathVariable("id_node") long nodeId, @RequestBody Map<String, String> body) {
-        
-        /*
-        body = {
-            "answer_id": "",
-            "information": "",
-            "notes": ""
-        }
-        */
         
         String answer_id = body.get("answer_id");
         String information = body.get("information");
@@ -106,9 +98,58 @@ public class NodeController {
         nodeService.addInformation(nodeId, answer_id, information, notes);
     }
 
-    //Get all Information related node ID
+    // Get all Information related node ID
     @RequestMapping(value = "/node/information/{id_node}/", method = RequestMethod.GET)
     public  @ResponseBody List<multiInformation> getAllInformation(@PathVariable("id_node") long id_node) {
         return nodeService.getAllInformation(id_node);
+    }
+
+    // Get Information
+    @RequestMapping(value = "/node/information_one/{id_node}/", method = RequestMethod.GET)
+    public @ResponseBody Information getInformation(@PathVariable("id_node") long id_node) {
+        return nodeService.getInformation(id_node);
+    }
+
+    // Get user by email
+    @RequestMapping(value = "/user/{email}", method = RequestMethod.GET)
+    public  @ResponseBody User getUser(@PathVariable("email") String email) {
+        return nodeService.getUser(email);
+    }
+
+    // Set title
+    @RequestMapping(value = "/title/{rootId}", method = RequestMethod.POST)
+    public void setTitle(@PathVariable("rootId") Long rootId, @RequestBody Map<String, String> body) {
+        String title = body.get("title");
+        nodeService.setTitle(rootId, title);
+    }
+    
+
+    @RequestMapping(value = "/user/", method = RequestMethod.POST)
+    public void addUser(@RequestBody Map<String, String> body) {
+        
+        String email = body.get("email");
+        String name = body.get("name");
+        String password = body.get("password");
+
+        nodeService.createUser(email, name, password);
+    }
+
+    @RequestMapping(value = "/user/addroot/{email}", method = RequestMethod.POST)
+    public void addRoot(@PathVariable("email") String email, @RequestBody Map<String, String> body) {
+        String rootId = body.get("rootId");
+        nodeService.addRootId(email, rootId);
+    }
+
+    // password check
+    @RequestMapping(value = "/user/login", method = RequestMethod.POST)
+    public @ResponseBody boolean checkUser(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        String password = body.get("password");
+
+        if(nodeService.checkUser(email, password)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
