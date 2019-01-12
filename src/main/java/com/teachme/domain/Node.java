@@ -14,17 +14,13 @@ public class Node {
 
     private Long nodeId;
     private Long rootId;
-
     private String question;
     private String questionHtml;
     private String questionLabel;
-    
     private String answer;
     private String answerHtml;
-    
     private String information;
     
-
 	private Node() { };
 
 	public Node(Long nodeId, String question, String question_html, String question_label, String answer, String answer_html, String information, Long rootId) {

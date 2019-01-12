@@ -29,6 +29,19 @@ public class User {
     public void setTreeRootIds(String rootId) {
         this.treeRootIds.add(rootId);
     }
+
+    public void deleteRootId(String rootId) {
+
+        System.out.println("----------------------------#######------------- "  + "i");
+        System.out.println(rootId);    
+        
+        for(int i = 0; i < this.treeRootIds.size(); i ++ ) {
+            if(this.treeRootIds.get(i).equals(rootId)) {
+                this.treeRootIds.remove(i);
+                System.out.println("----------------------------#######------------- "  + i);
+            }
+        }
+    }
     
     public String getName() {
         return this.name;

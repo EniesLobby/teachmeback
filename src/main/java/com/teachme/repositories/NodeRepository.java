@@ -28,7 +28,7 @@ public interface NodeRepository extends PagingAndSortingRepository<Node, Long> {
     // delete for given node this node, and his hasChild relations
     String delete_hasChildren = "MATCH (n1:Node {nodeId: {nodeId}})-[rel1:hasChild]->(n2:Node) DETACH DELETE rel1, n2";
 
-    //delete all node and information related
+    //delete all nodes and information related
     String delete = "MATCH (n1:Node {nodeId: {nodeId}})-[rel1:hasInformation]->(n2:Information)-[rel2:MULTI_INFORMATION]->(n3:multiInformation) DETACH DELETE rel1, rel2, n1, n2, n3";
 
     @Query(relations)

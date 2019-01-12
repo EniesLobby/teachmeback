@@ -83,12 +83,14 @@ public class NodeService {
     }
 
     public Node getNode(Long Id) {
+        
         Optional<Node> thenode = nodeRepository.findBynodeId(Id);
         
         if(!thenode.isPresent()) {
-            
+            return thenode.get();   
+        } else {
+            return null;
         }
-        return thenode.get();
     }
 
     public void updateNode(Long Id, Node node) {
@@ -127,10 +129,8 @@ public class NodeService {
     }
 
     public void addInformation(Long node_id, String answer_id, String information, String note) {
-        Optional<Node> found_node = nodeRepository.findBynodeId(node_id);
 
-        System.out.print("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-        System.out.print(found_node.isPresent());
+        Optional<Node> found_node = nodeRepository.findBynodeId(node_id);
 
         if(found_node.isPresent()) {
             Optional<Information> found_inf = informationRepository.findBynodeId(node_id);
@@ -174,12 +174,40 @@ public class NodeService {
 
 
     public void setTitle(Long rootId, String title) {
+
         Optional<Information> information = this.informationRepository.findBynodeId(rootId);
+        Optional<Node> foundNode = this.nodeRepository.findBynodeId(rootId);
         
         if(information.isPresent()) {
             information.get().setNote(title);
             this.informationRepository.save(information.get());
+        } else {
+            if(foundNode.isPresent()) {
+                this.addInformation(rootId, "", "", title);
+            }
         }
+    }
+
+    public boolean treeIsExist(Long rootId) {
+        Optional<Node> foundNode = this.nodeRepository.findBynodeId(rootId);
+        
+        return foundNode.isPresent();
+    }
+
+    public void deleteTree(Long rootId, String email) {
+        this.deleteNode(rootId);
+        User foundUser = this.userRepository.findByEmail(email);
+        foundUser.deleteRootId(String.valueOf(rootId));
+
+        for(int i = 0; i < foundUser.getTreeRootIds().size(); i ++ ) {
+            
+            Long currentRootId = Long.parseLong(foundUser.getTreeRootIds().get(i));
+            if(!this.treeIsExist(currentRootId) ) {
+                foundUser.deleteRootId(String.valueOf(currentRootId));
+            }
+        }
+
+        this.userRepository.save(foundUser);
     }
     
     public String treeFromIdCT(Long Id) {
@@ -283,6 +311,22 @@ public class NodeService {
     }
 
     public Information getInformation(Long rootId) {
-        return this.informationRepository.findBynodeId(rootId).get();
+        Optional<Information> foundNode = this.informationRepository.findBynodeId(rootId);
+        
+        if(foundNode.isPresent()) {
+            return foundNode.get();
+        } else {
+            return null;
+        }
     }
+
+    public void updateTitle(Long rootId, String title) {
+        Optional<Information> foundNode = this.informationRepository.findBynodeId(rootId);
+
+        if(foundNode.isPresent()) {
+            foundNode.get().setNote(title);
+            informationRepository.save(foundNode.get());
+        }
+    }
+
 }

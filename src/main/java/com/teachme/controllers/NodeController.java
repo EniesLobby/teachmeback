@@ -61,9 +61,15 @@ public class NodeController {
         return nodeService.addChildToNode(id, node);
     }
 
-    @DeleteMapping("/deleteNode/{nodeId}")
+    @DeleteMapping("/node/delete/{nodeId}")
     public void deleteNode(@PathVariable("nodeId") Long nodeId) {
         nodeService.deleteNode(nodeId);
+    }
+
+    @RequestMapping(value = "/tree/delete/{rootId}/user/{email}", method = RequestMethod.DELETE)
+    public boolean deleteTree(@PathVariable("rootId") Long rootId, @PathVariable("email") String email) {
+        nodeService.deleteTree(rootId, email);
+        return true;
     }
 
     @DeleteMapping("/deleteAnswer/node/{nodeId}/answer/{answer_id}")
@@ -107,12 +113,15 @@ public class NodeController {
     // Get Information
     @RequestMapping(value = "/node/information_one/{id_node}/", method = RequestMethod.GET)
     public @ResponseBody Information getInformation(@PathVariable("id_node") long id_node) {
-        return nodeService.getInformation(id_node);
+        Information result = nodeService.getInformation(id_node);
+       
+        return result;
     }
 
     // Get user by email
     @RequestMapping(value = "/user/{email}", method = RequestMethod.GET)
     public  @ResponseBody User getUser(@PathVariable("email") String email) {
+        System.out.println(email);
         return nodeService.getUser(email);
     }
 
@@ -122,7 +131,13 @@ public class NodeController {
         String title = body.get("title");
         nodeService.setTitle(rootId, title);
     }
-    
+
+    // Update title
+    @RequestMapping(value="/user/title/{rootId}", method = RequestMethod.POST)
+    public void updateTitle(@PathVariable("rootId") Long rootId, @RequestBody Map<String, String> body) {
+        String title = body.get("title");
+        nodeService.updateTitle(rootId, title);
+    }
 
     @RequestMapping(value = "/user/", method = RequestMethod.POST)
     public void addUser(@RequestBody Map<String, String> body) {
@@ -152,4 +167,5 @@ public class NodeController {
             return false;
         }
     }
+
 }
