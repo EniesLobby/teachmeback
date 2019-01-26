@@ -12,7 +12,6 @@ public class Information {
 
     private Long nodeId;
     private Long rootId;
-
     private String note;
 
     private List<multiInformation> multiInformation = new ArrayList<>();

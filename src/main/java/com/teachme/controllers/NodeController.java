@@ -41,6 +41,12 @@ public class NodeController {
         return nodeService.treeFromIdCT(id);
     }
 
+    // returns json tree in normal json
+    @GetMapping("/getTree")
+    public String getTree(@RequestParam long id) {
+        return nodeService.getTree(id);
+    }
+
     // Retrieve children of the given node
     @RequestMapping(value = "/node/{id}/children", produces = "application/json; charset=UTF-8", method = RequestMethod.GET)
     public @ResponseBody List<Node> getChildren(@PathVariable("id") long id) {
@@ -71,6 +77,8 @@ public class NodeController {
         nodeService.deleteTree(rootId, email);
         return true;
     }
+
+    @RequestMapping(value = "/tree/title")
 
     @DeleteMapping("/deleteAnswer/node/{nodeId}/answer/{answer_id}")
     public void deleteAnswer(@PathVariable("nodeId") Long nodeId, @PathVariable("answer_id") String answer_id) {

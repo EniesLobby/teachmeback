@@ -44,6 +44,10 @@ public class NodeService {
         //check if counter exists
     }
 
+    public String getTree(Long rootId) {
+        return this.nodeRepository.getTree(rootId);
+    }
+
     public Long getCurrentCounter() {
         
         Counter counter = counterRepository.findBylabel("counter");
@@ -84,13 +88,9 @@ public class NodeService {
 
     public Node getNode(Long Id) {
         
-        Optional<Node> thenode = nodeRepository.findBynodeId(Id);
+        Node thenode = nodeRepository.getNode(Id);
         
-        if(!thenode.isPresent()) {
-            return thenode.get();   
-        } else {
-            return null;
-        }
+        return thenode;  
     }
 
     public void updateNode(Long Id, Node node) {

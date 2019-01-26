@@ -16,7 +16,7 @@ public interface NodeRepository extends PagingAndSortingRepository<Node, Long> {
     List<Node> findByinformation(@Param("information") String information);
 
     String cypherQuery = "MATCH p = (n:Node {nodeId:{id}})-[:hasChild *0..]->(child) WITH COLLECT(p) AS ps CALL apoc.convert.toTree(ps) yield value RETURN apoc.convert.toJson(value)";
-    String cypherQueryCT = "MATCH (n:Node { nodeId:{id} })-[rel:hasChild *0..]->(child: Node) RETURN child.nodeId, rel";
+    String cypherQueryCT = "MATCH (n:Node { nodeId: {id} })-[rel:hasChild *0..]->(child: Node) RETURN child.nodeId, rel";
  
     //returns only nodes List<Node>
     String nodes = "MATCH p=(n:Node { rootId: {id} }) RETURN n";
@@ -30,6 +30,12 @@ public interface NodeRepository extends PagingAndSortingRepository<Node, Long> {
 
     //delete all nodes and information related
     String delete = "MATCH (n1:Node {nodeId: {nodeId}})-[rel1:hasInformation]->(n2:Information)-[rel2:MULTI_INFORMATION]->(n3:multiInformation) DETACH DELETE rel1, rel2, n1, n2, n3";
+
+    //get one Node
+    String getNode = "MATCH (n: Node {nodeId: {nodeId}})-[rel:hasChild]->(child:Node) RETURN n, rel";
+
+    @Query(cypherQuery)
+    String getTree(@Param("id") Long nodeId);
 
     @Query(relations)
     String tree(@Param("id") Long id);
@@ -48,6 +54,9 @@ public interface NodeRepository extends PagingAndSortingRepository<Node, Long> {
 
     @Query(delete_hasChildren)
     void deleteByNodeIdhasChildren(@Param("nodeId") Long nodeId);
+
+    @Query(getNode)
+    Node getNode(@Param("nodeId") Long nodeId);
 }
 
 
