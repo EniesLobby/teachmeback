@@ -329,4 +329,12 @@ public class NodeService {
         }
     }
 
+    public multiInformation getInformationSpec(String id_node) {
+        Optional<multiInformation> foundMultiInformation = multiInformationRepository.getSpecificInformation(id_node);
+        if(foundMultiInformation.isPresent()) {
+            return foundMultiInformation.get();
+        }
+        return null;
+    }
+
 }

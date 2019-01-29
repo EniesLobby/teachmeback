@@ -126,6 +126,14 @@ public class NodeController {
         return result;
     }
 
+    //Get Specific Information
+    @RequestMapping(value = "/node/informationspec/{id_node}/", method = RequestMethod.GET)
+    public @ResponseBody multiInformation getInformationSpec(@PathVariable("id_node") String id_node) {
+        multiInformation result = nodeService.getInformationSpec(id_node);
+
+        return result;
+    }
+
     // Get user by email
     @RequestMapping(value = "/user/{email}", method = RequestMethod.GET)
     public  @ResponseBody User getUser(@PathVariable("email") String email) {
