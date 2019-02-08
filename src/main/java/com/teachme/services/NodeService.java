@@ -133,7 +133,7 @@ public class NodeService {
         Optional<Node> found_node = nodeRepository.findBynodeId(node_id);
 
         if(found_node.isPresent()) {
-            Optional<Information> found_inf = informationRepository.findBynodeId(node_id);
+            Optional<Information> found_inf = informationRepository.findWithNodeId(node_id);
             if(found_inf.isPresent()) {
                 Optional<multiInformation> found_multiInf = multiInformationRepository.getOneInformation(node_id, answer_id);
 
@@ -195,7 +195,7 @@ public class NodeService {
     }
 
     public void deleteTree(Long rootId, String email) {
-        this.deleteNode(rootId);
+        //this.deleteNode(rootId);
         User foundUser = this.userRepository.findByEmail(email);
         foundUser.deleteRootId(String.valueOf(rootId));
 
@@ -330,7 +330,27 @@ public class NodeService {
     }
 
     public multiInformation getInformationSpec(String id_node) {
-        Optional<multiInformation> foundMultiInformation = multiInformationRepository.getSpecificInformation(id_node);
+
+        List<Long> idList = new ArrayList<>();
+
+        // Need to sort array id_node
+        for (String retval : id_node.split("-")) {
+            Long currentId = Long.parseLong(retval);
+            idList.add(currentId);
+        }
+
+        Collections.sort(idList);
+
+        String newId = "";
+
+        for(Long item : idList) {
+            String currentString = Long.toString(item);
+            newId = newId + currentString + "-";
+        }
+
+        String str = newId.substring(0, newId.length() - 1);
+
+        Optional<multiInformation> foundMultiInformation = multiInformationRepository.getSpecificInformation(str);
         if(foundMultiInformation.isPresent()) {
             return foundMultiInformation.get();
         }
