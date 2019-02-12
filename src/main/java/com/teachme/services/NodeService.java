@@ -58,8 +58,8 @@ public class NodeService {
         return currentCounter;
     }
 
-    public void createUser(String email, String name, String password ) {
-        User user = new User(name, email, password);
+    public void createUser(String email, String name, String password, Boolean firstEnter ) {
+        User user = new User(name, email, password, firstEnter);
         userRepository.save(user);
     }
 
@@ -160,6 +160,7 @@ public class NodeService {
     }
 
     public boolean checkUser(String email, String password) {
+        
         User user = userRepository.findByEmail(email);
         if(Objects.equals(user.getPassword(), password)) {
             return true;
@@ -170,6 +171,13 @@ public class NodeService {
 
     public User getUser(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    public void setViewed(String email) {
+
+        User user = userRepository.findByEmail(email);
+        user.setFirstEnter(false);
+        userRepository.save(user);
     }
 
 
@@ -311,7 +319,7 @@ public class NodeService {
     }
 
     public Information getInformation(Long rootId) {
-        Optional<Information> foundNode = this.informationRepository.findBynodeId(rootId);
+        Optional<Information> foundNode = this.informationRepository.findWithNodeId(rootId);
         
         if(foundNode.isPresent()) {
             return foundNode.get();
@@ -354,6 +362,7 @@ public class NodeService {
         if(foundMultiInformation.isPresent()) {
             return foundMultiInformation.get();
         }
+        
         return null;
     }
 

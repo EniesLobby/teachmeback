@@ -12,11 +12,13 @@ public class User {
     private String name;
     private String email;
     private String password;
+    private Boolean firstEnter;
     private List<String> treeRootIds = new ArrayList<>();
 
-    public User(String name, String email, String password) {
+    public User(String name, String email, String password, Boolean firstEnter) {
         this.name = name;
         this.email = email;
+        this.firstEnter = firstEnter;
         this.password = password;
     };
 
@@ -30,15 +32,11 @@ public class User {
         this.treeRootIds.add(rootId);
     }
 
-    public void deleteRootId(String rootId) {
-
-        System.out.println("----------------------------#######------------- "  + "i");
-        System.out.println(rootId);    
+    public void deleteRootId(String rootId) { 
         
         for(int i = 0; i < this.treeRootIds.size(); i ++ ) {
             if(this.treeRootIds.get(i).equals(rootId)) {
                 this.treeRootIds.remove(i);
-                System.out.println("----------------------------#######------------- "  + i);
             }
         }
     }
@@ -65,5 +63,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void setFirstEnter(Boolean firstEnter) {
+        // Changes after click in tutorial
+        this.firstEnter = firstEnter;
+    }
+
+    public Boolean getFirstEnter() {
+        return this.firstEnter;
     }
 }

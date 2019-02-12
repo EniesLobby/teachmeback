@@ -29,19 +29,19 @@ public class NodeController {
 		this.nodeService = nodeService;
 	}
 
-    // creates a tree
+    // Creates a tree
     @RequestMapping(value = "/createTree", method = RequestMethod.POST)
     public Long createTree() {
         return nodeService.createTree();
     }
 
-    // returns json tree in cytoscape format
+    // Returns json tree in cytoscape format
     @GetMapping("/getTreeCT")
     public String getTreeCT(@RequestParam long id) {
         return nodeService.treeFromIdCT(id);
     }
 
-    // returns json tree in normal json
+    // Returns json tree in normal json
     @GetMapping("/getTree")
     public String getTree(@RequestParam long id) {
         return nodeService.getTree(id);
@@ -77,8 +77,6 @@ public class NodeController {
         nodeService.deleteTree(rootId, email);
         return true;
     }
-
-    @RequestMapping(value = "/tree/title")
 
     @DeleteMapping("/deleteAnswer/node/{nodeId}/answer/{answer_id}")
     public void deleteAnswer(@PathVariable("nodeId") Long nodeId, @PathVariable("answer_id") String answer_id) {
@@ -155,14 +153,16 @@ public class NodeController {
         nodeService.updateTitle(rootId, title);
     }
 
+    // Add user
     @RequestMapping(value = "/user/", method = RequestMethod.POST)
     public void addUser(@RequestBody Map<String, String> body) {
         
         String email = body.get("email");
         String name = body.get("name");
+        Boolean firstEnter = Boolean.parseBoolean(body.get("firstEnter"));
         String password = body.get("password");
 
-        nodeService.createUser(email, name, password);
+        nodeService.createUser(email, name, password, firstEnter);
     }
 
     @RequestMapping(value = "/user/addroot/{email}", method = RequestMethod.POST)
@@ -182,6 +182,13 @@ public class NodeController {
         } else {
             return false;
         }
+    }
+
+    // set firstTime to false
+    @RequestMapping(value = "/user/viewed/{email}", method = RequestMethod.POST)
+    public void setViewed(@PathVariable("email") String email) {
+        
+        nodeService.setViewed(email);
     }
 
 }
