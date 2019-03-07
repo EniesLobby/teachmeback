@@ -165,13 +165,14 @@ public class NodeController {
         nodeService.createUser(email, name, password, firstEnter);
     }
 
+    // Add rootId to email
     @RequestMapping(value = "/user/addroot/{email}", method = RequestMethod.POST)
     public void addRoot(@PathVariable("email") String email, @RequestBody Map<String, String> body) {
         String rootId = body.get("rootId");
         nodeService.addRootId(email, rootId);
     }
 
-    // password check
+    // Password check
     @RequestMapping(value = "/user/login", method = RequestMethod.POST)
     public @ResponseBody boolean checkUser(@RequestBody Map<String, String> body) {
         String email = body.get("email");
@@ -184,7 +185,7 @@ public class NodeController {
         }
     }
 
-    // set firstTime to false
+    // Set firstTime to false
     @RequestMapping(value = "/user/viewed/{email}", method = RequestMethod.POST)
     public void setViewed(@PathVariable("email") String email) {
         

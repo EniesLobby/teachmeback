@@ -20,7 +20,8 @@ public interface multiInformationRepository extends PagingAndSortingRepository<m
     String delete = "MATCH (n1:Node {nodeId: {nodeId}})-[:hasInformation]->(n2:Information)-[:MULTI_INFORMATION]->(n3:multiInformation {idOfNodes: {answer_id}}) RETURN n3";
 
     // returns one specific information not equal to nodeId
-    String specInformation = "MATCH (n1:multiInformation {idOfNodes: {nodeId}})<-[r1:MULTI_INFORMATION]-(:Information)<-[r2:hasInformation]-(n2:Node) WHERE n2.nodeId <> toInteger({nodeId}) RETURN n1";
+    String specInformationSingle = "MATCH (n1:multiInformation {idOfNodes: {nodeId}})<-[r1:MULTI_INFORMATION]-(:Information)<-[r2:hasInformation]-(n2:Node) WHERE n2.nodeId <> toInteger({nodeId}) RETURN n1";
+    String specInformationMulti = "MATCH (n1:multiInformation {idOfNodes: {nodeId}})<-[r1:MULTI_INFORMATION]-(:Information)<-[r2:hasInformation]-(n2:Node) RETURN n1";
     
     @Query(information)
     List<multiInformation> getAllInformation(@Param("nodeId") Long id);
@@ -31,6 +32,9 @@ public interface multiInformationRepository extends PagingAndSortingRepository<m
     @Query(delete)
     void deleteAnswer(@Param("nodeId") Long nodeId, @Param("answer_id") String answer_id);
 
-    @Query(specInformation)
+    @Query(specInformationSingle)
     Optional<multiInformation> getSpecificInformation(@Param("nodeId") String idOfNodes);
+
+    @Query(specInformationMulti)
+    Optional<multiInformation> getSpecificInformationMulti(@Param("nodeId") String idOfNodes);
 }

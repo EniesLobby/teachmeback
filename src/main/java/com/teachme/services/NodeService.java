@@ -16,10 +16,15 @@ public class NodeService {
     private final multiInformationRepository multiInformationRepository;
     private final UserRepository userRepository;
     
-    public NodeService(NodeRepository nodeRepository, CounterRepository counterRepository,
-        hasChildRepository haschildRepository, hasInformationRepository hasinformationRepository, 
-        informationRepository informationRepository, multiInformationRepository multiInformationRepository,
-        UserRepository userRepository) {
+    public NodeService(
+        NodeRepository nodeRepository, 
+        CounterRepository counterRepository,
+        hasChildRepository haschildRepository, 
+        hasInformationRepository hasinformationRepository, 
+        informationRepository informationRepository, 
+        multiInformationRepository multiInformationRepository,
+        UserRepository userRepository
+        ) {
         this.nodeRepository = nodeRepository;
         this.counterRepository = counterRepository;
         this.haschildRepository = haschildRepository;
@@ -31,20 +36,22 @@ public class NodeService {
 
     // Creates new tree and returns id of the root
     public Long createTree() {
+        
         Long rootId = getCurrentCounter();
         Node root = new Node(rootId, "", "", "", "", "", "", rootId);
         nodeRepository.save(root);
+        
         return rootId;
-        //write this id to user's tree list as root
     }
 
     public void createCounter() {
+        
         Counter counter = new Counter();
         counterRepository.save(counter);
-        //check if counter exists
     }
 
     public String getTree(Long rootId) {
+
         return this.nodeRepository.getTree(rootId);
     }
 
@@ -59,11 +66,13 @@ public class NodeService {
     }
 
     public void createUser(String email, String name, String password, Boolean firstEnter ) {
+
         User user = new User(name, email, password, firstEnter);
         userRepository.save(user);
     }
 
     public void addRootId(String email, String rootId) {
+        
         User user = userRepository.findByEmail(email);
         user.setTreeRootIds(rootId);
         userRepository.save(user);
@@ -111,6 +120,7 @@ public class NodeService {
 
     // Delete node with all related information
     public void deleteNode(Long nodeId) {
+
         if(this.nodeRepository.findBynodeId(nodeId).isPresent()) {
             this.nodeRepository.deleteByNodeIdhasChildren(nodeId);
             this.nodeRepository.delete(this.nodeRepository.findBynodeId(nodeId).get());
@@ -119,10 +129,12 @@ public class NodeService {
 
     // it is just delete the node :)
     public void deleteAnswer(Long nodeId, String answer_id) {
+        
         this.multiInformationRepository.deleteAnswer(nodeId, answer_id);
     }
 
     public void deleteAll() {
+        
         nodeRepository.deleteAll();
         multiInformationRepository.deleteAll();
         informationRepository.deleteAll();
@@ -170,6 +182,7 @@ public class NodeService {
     }
 
     public User getUser(String email) {
+
         return userRepository.findByEmail(email);
     }
 
@@ -197,12 +210,14 @@ public class NodeService {
     }
 
     public boolean treeIsExist(Long rootId) {
+
         Optional<Node> foundNode = this.nodeRepository.findBynodeId(rootId);
         
         return foundNode.isPresent();
     }
 
     public void deleteTree(Long rootId, String email) {
+
         //this.deleteNode(rootId);
         User foundUser = this.userRepository.findByEmail(email);
         foundUser.deleteRootId(String.valueOf(rootId));
@@ -309,12 +324,16 @@ public class NodeService {
     }
 
     public List<Node> getChildren(Long id) {
+
         List<Node> children =  this.nodeRepository.getChildren(id);
+        
         return children;
     }
 
     public List<multiInformation> getAllInformation(Long nodeId) {
+        
         List<multiInformation> allInf = this.multiInformationRepository.getAllInformation(nodeId);
+        
         return allInf;
     }
 
@@ -329,6 +348,7 @@ public class NodeService {
     }
 
     public void updateTitle(Long rootId, String title) {
+        
         Optional<Information> foundNode = this.informationRepository.findBynodeId(rootId);
 
         if(foundNode.isPresent()) {
@@ -339,28 +359,38 @@ public class NodeService {
 
     public multiInformation getInformationSpec(String id_node) {
 
-        List<Long> idList = new ArrayList<>();
+        if(id_node.indexOf("-") != -1) {
+            List<Long> idList = new ArrayList<>();
 
-        // Need to sort array id_node
-        for (String retval : id_node.split("-")) {
-            Long currentId = Long.parseLong(retval);
-            idList.add(currentId);
-        }
-
-        Collections.sort(idList);
-
-        String newId = "";
-
-        for(Long item : idList) {
-            String currentString = Long.toString(item);
-            newId = newId + currentString + "-";
-        }
-
-        String str = newId.substring(0, newId.length() - 1);
-
-        Optional<multiInformation> foundMultiInformation = multiInformationRepository.getSpecificInformation(str);
-        if(foundMultiInformation.isPresent()) {
-            return foundMultiInformation.get();
+            // Need to sort array id_node
+            for (String retval : id_node.split("-")) {
+                Long currentId = Long.parseLong(retval);
+                idList.add(currentId);
+            }
+    
+            Collections.sort(idList);
+    
+            String newId = "";
+    
+            for(Long item : idList) {
+                String currentString = Long.toString(item);
+                newId = newId + currentString + "-";
+            }
+    
+            String str = newId.substring(0, newId.length() - 1);
+    
+            Optional<multiInformation> foundMultiInformation = multiInformationRepository.getSpecificInformationMulti(str);
+            if(foundMultiInformation.isPresent()) {
+                return foundMultiInformation.get();
+            } else {
+                Optional<multiInformation> foundMultiInformationMirror = multiInformationRepository.getSpecificInformationMulti(id_node);
+                return foundMultiInformationMirror.get();
+            }
+        } else {
+            Optional<multiInformation> foundMultiInformation = multiInformationRepository.getSpecificInformation(id_node);
+            if(foundMultiInformation.isPresent()) {
+                return foundMultiInformation.get();
+            }
         }
         
         return null;
